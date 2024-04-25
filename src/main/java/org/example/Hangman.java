@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.exceptions.NoWordsFound;
+import org.example.exceptions.NoWordsFoundException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -8,33 +8,55 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class Hangman{
+/**
+ * Kinda controller. It analyzes correctness of user answers and controls game progress.
+ */
+public class Hangman {
 
+    /**
+     * Path to file with words.
+     */
     private final String WORDS_RESOURCE_PATH = "Words";
+
+    /**
+     * Game state that represents the game progress.
+     */
     private GameState state;
+
+    /**
+     * Exit flag. If this is true - the program will exit.
+     */
     private boolean exit;
-    private List<String> words;
+
+    /**
+     * Collection of words.
+     */
+    private final List<String> words;
+
+    /**
+     * Current word that user must guess.
+     */
     private String secretWord;
+
+    /**
+     * Contains positions of correct answered letters in the word.
+     */
     private BitSet mask;
 
+    /**
+     * Standard constructor without parameters.
+     */
     Hangman() {
         state = GameState.ERRORS_0;
         exit = false;
         words = getWords();
     }
 
-    public static void main(String... args) {
-        Hangman hm = new Hangman();
-        try {
-            var words = hm.getWords();
-            words.forEach(System.out::println);
-        } catch (Exception e) {
-            System.out.println("Can't find any words, try to check \"resouces\" folder!");
-        }
-    }
-
+    /**
+     * Let the battle BEGIN!!!
+     */
     public void start() {
-        int wordIndex = 0;
+        int wordIndex;
         Random rand = new Random();
 
         UserInterface.showMessage("Do you want to continue?");
@@ -51,8 +73,10 @@ public class Hangman{
                 UserInterface.maskTheWord(secretWord, mask);
                 if (isCorrectLetter(UserInterface.takeALetterRecursive(), secretWord, mask)) {
                     UserInterface.showMessage("Correct!");
-                    if (isAnswered(mask))
+                    if (isAnswered(mask)) {
                         state = GameState.WIN;
+                        UserInterface.paintGameState(state);
+                    }
                 } else {
                     UserInterface.showMessage("WRONG!");
 
@@ -80,18 +104,24 @@ public class Hangman{
                 }
             }
 
-            UserInterface.paintGameState(state);
-
             UserInterface.showMessage("Do you want to continue?");
             exit = !UserInterface.takeYesNoAnswerRecursive();
             state = GameState.ERRORS_0;
         }
     }
 
+    /**
+     * Getting the words-collection from resources.
+     *
+     * @return list of words.
+     */
     private List<String> getWords() {
         List<String> words = new ArrayList<>();
 
         InputStream is = getClass().getClassLoader().getResourceAsStream(WORDS_RESOURCE_PATH);
+        if (is == null)
+            throw new NoWordsFoundException("Can't found any words, please check \"resources\" folder!");
+
         InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(streamReader);
         try {
@@ -100,14 +130,22 @@ public class Hangman{
             }
 
         } catch (Exception e) {
-            throw (NoWordsFound)
-                    new NoWordsFound("Can't found any words, please check \"resources\" folder!")
+            throw (NoWordsFoundException)
+                    new NoWordsFoundException("Can't found any words, please check \"resources\" folder!")
                             .initCause(e);
         }
 
         return words;
     }
 
+    /**
+     * Checks if word contains that letter and if so - changes the mask.
+     *
+     * @param letter user answer.
+     * @param word   secret word.
+     * @param mask   mask......
+     * @return true if answer is correct, false if not.
+     */
     private boolean isCorrectLetter(String letter, String word, BitSet mask) {
         boolean result = false;
         for (int i = 0; i < word.length(); i++)
@@ -119,6 +157,12 @@ public class Hangman{
         return result;
     }
 
+    /**
+     * Checks if the riddle is solved. If all bits in mask are ture then the riddle is solved.
+     *
+     * @param mask mask...
+     * @return true if the riddle is solved, false if not.
+     */
     private boolean isAnswered(BitSet mask) {
         for (int i = 0; i < mask.length() - 1; i++)
             if (!mask.get(i))

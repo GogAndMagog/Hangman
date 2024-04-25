@@ -1,5 +1,8 @@
 package org.example;
 
+/**
+ * Contain all game states. Five errors states and one win state.
+ */
 public enum GameState {
     ERRORS_0(" ___________.._______\n" +
                     "| .__________))______|\n" +
@@ -173,9 +176,23 @@ public enum GameState {
             "        `-....-'     ````    `--'      `-._       (`- `-._`-.   hjw")
     ;
 
-    public final String view;
+    /**
+     * ASCII-image that represents game progress.
+     */
+    private final String view;
 
+    /**
+     * Creates state with ASCII-image bounded to them.
+     * @param view ASCII-image.
+     */
     GameState(String view) {
         this.view = view;
     }
+
+    /**
+     * Getter of ASCII-image.
+     * @return
+     */
+    public String getView()
+    {return this.view;}
 }
