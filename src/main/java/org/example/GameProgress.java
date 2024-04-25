@@ -3,8 +3,8 @@ package org.example;
 /**
  * Contain all game states. Five errors states and one win state.
  */
-public enum GameState {
-    ERRORS_0(" ___________.._______\n" +
+public enum GameProgress {
+    PICTURE_0(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -28,7 +28,7 @@ public enum GameState {
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."
     ),
-    ERRORS_1(" ___________.._______\n" +
+    PICTURE_1(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -51,7 +51,7 @@ public enum GameState {
                     "| |        \\ \\        | |\n" +
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."),
-    ERRORS_2(" ___________.._______\n" +
+    PICTURE_2(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -74,7 +74,7 @@ public enum GameState {
                     "| |        \\ \\        | |\n" +
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."),
-    ERRORS_3(" ___________.._______\n" +
+    PICTURE_3(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -98,7 +98,7 @@ public enum GameState {
                     "| |        \\ \\        | |\n" +
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."),
-    ERRORS_4(" ___________.._______\n" +
+    PICTURE_4(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -121,7 +121,7 @@ public enum GameState {
                     "| |        \\ \\        | |\n" +
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."),
-    ERRORS_5(" ___________.._______\n" +
+    PICTURE_5(" ___________.._______\n" +
                     "| .__________))______|\n" +
                     "| | / /      ||\n" +
                     "| |/ /       ||\n" +
@@ -144,7 +144,7 @@ public enum GameState {
                     "| |        \\ \\        | |\n" +
                     ": :         \\ \\       : :  \n" +
                     ". .          `'       . ."),
-    WIN("                             ,.        ,.      ,.\n" +
+    PICTURE_6("                             ,.        ,.      ,.\n" +
             "                                ||        ||      ||  ()\n" +
             " ,--. ,-. ,.,-.  ,--.,.,-. ,-.  ||-.,.  ,.|| ,-.  ||-.,. ,-. ,.,-.  ,--.\n" +
             "//`-'//-\\\\||/|| //-||||/`'//-\\\\ ||-'||  ||||//-\\\\ ||-'||//-\\\\||/|| ((`-'\n" +
@@ -176,23 +176,12 @@ public enum GameState {
             "        `-....-'     ````    `--'      `-._       (`- `-._`-.   hjw")
     ;
 
-    /**
-     * ASCII-image that represents game progress.
-     */
-    private final String view;
+    private final String asciiImage;
 
-    /**
-     * Creates state with ASCII-image bounded to them.
-     * @param view ASCII-image.
-     */
-    GameState(String view) {
-        this.view = view;
+    GameProgress(String asciiIamge) {
+        this.asciiImage = asciiIamge;
     }
 
-    /**
-     * Getter of ASCII-image.
-     * @return
-     */
-    public String getView()
-    {return this.view;}
+    public String getAsciiImage()
+    {return this.asciiImage;}
 }

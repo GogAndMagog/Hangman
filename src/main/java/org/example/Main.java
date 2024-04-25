@@ -1,14 +1,8 @@
 package org.example;
 
-/**
- * It starts everything. Alpha and Omega.
- */
+import org.example.controller.Hangman;
+
 public class Main {
-    /**
-     * Program entry point.
-     *
-     * @param args command line arguments.
-     */
     public static void main(String[] args) {
         try {
             Hangman hangman = new Hangman();

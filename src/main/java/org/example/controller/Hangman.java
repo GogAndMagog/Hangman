@@ -1,6 +1,12 @@
-package org.example;
+package org.example.controller;
 
+import org.example.GameProgress;
+import org.example.UserInterface;
 import org.example.exceptions.NoWordsFoundException;
+import org.example.model.Dictionary;
+import org.example.model.LocalDictionary;
+import org.example.veiw.ConsoleView;
+import org.example.veiw.View;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,84 +27,53 @@ public class Hangman {
     /**
      * Game state that represents the game progress.
      */
-    private GameState state;
-
-    /**
-     * Exit flag. If this is true - the program will exit.
-     */
+    private GameProgress state;
     private boolean exit;
-
-    /**
-     * Collection of words.
-     */
     private final List<String> words;
-
-    /**
-     * Current word that user must guess.
-     */
     private String secretWord;
+
+    Dictionary dictionary = new LocalDictionary();
+    View view = new ConsoleView();
 
     /**
      * Contains positions of correct answered letters in the word.
      */
     private BitSet mask;
 
-    /**
-     * Standard constructor without parameters.
-     */
-    Hangman() {
-        state = GameState.ERRORS_0;
+    public Hangman() {
+        state = GameProgress.PICTURE_0;
         exit = false;
-        words = getWords();
+        dictionary = new LocalDictionary();
+        words = dictionary.getWords();
     }
 
-    /**
-     * Let the battle BEGIN!!!
-     */
     public void start() {
-        int wordIndex;
-        Random rand = new Random();
+
+        if (words.isEmpty()) {
+            view.showMessage("No words found, sorry...");
+            return;
+        }
 
         UserInterface.showMessage("Do you want to continue?");
         exit = !UserInterface.takeYesNoAnswerRecursive();
 
         while (!exit) {
-            wordIndex = rand.nextInt(0, words.size());
-            secretWord = words.get(wordIndex);
-            mask = new BitSet();
-            mask.set(0, secretWord.length() - 1, false);
-            mask.set(secretWord.length(), true);
+            secretWord = takeRandomWord(words);
+            mask = initMask(secretWord);
 
-            while (state != GameState.ERRORS_5 && state != GameState.WIN) {
+            while (state != GameProgress.PICTURE_5 && state != GameProgress.PICTURE_6) {
                 UserInterface.maskWord(secretWord, mask);
                 if (isCorrectLetter(UserInterface.takeALetter(), secretWord, mask)) {
                     UserInterface.showMessage("Correct!");
                     if (isAnswered(mask)) {
-                        state = GameState.WIN;
+                        state = GameProgress.PICTURE_6;
                         UserInterface.paintGameState(state);
                     }
                 } else {
                     UserInterface.showMessage("WRONG!");
 
-                    switch (state) {
-                        case GameState.ERRORS_0:
-                            state = GameState.ERRORS_1;
-                            break;
-                        case GameState.ERRORS_1:
-                            state = GameState.ERRORS_2;
-                            break;
-                        case GameState.ERRORS_2:
-                            state = GameState.ERRORS_3;
-                            break;
-                        case GameState.ERRORS_3:
-                            state = GameState.ERRORS_4;
-                            break;
-                        case GameState.ERRORS_4:
-                            state = GameState.ERRORS_5;
-                            break;
-                        default:
-                            break;
-                    }
+                    int step = state.ordinal() + 1;
+                    state = state.values()[step];
 
                     UserInterface.paintGameState(state);
                 }
@@ -106,8 +81,23 @@ public class Hangman {
 
             UserInterface.showMessage("Do you want to continue?");
             exit = !UserInterface.takeYesNoAnswerRecursive();
-            state = GameState.ERRORS_0;
+            state = GameProgress.PICTURE_0;
         }
+    }
+
+    private String takeRandomWord(List<String> words) {
+        int wordIndex;
+        Random rand = new Random();
+        wordIndex = rand.nextInt(0, words.size());
+        return words.get(wordIndex);
+    }
+
+    private BitSet initMask(String secretWord)
+    {
+        BitSet initialMask = new BitSet();
+        initialMask.set(0, secretWord.length() - 1, false);
+        initialMask.set(secretWord.length(), true);
+        return initialMask;
     }
 
     /**

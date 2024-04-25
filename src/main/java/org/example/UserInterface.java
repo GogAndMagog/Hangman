@@ -119,8 +119,8 @@ public class UserInterface {
      * Prints the hanged man, depends on current game state.
      * @param state game state.
      */
-    public static void paintGameState(GameState state) {
-        System.out.println(state.getView());
+    public static void paintGameState(GameProgress state) {
+        System.out.println(state.getAsciiImage());
     }
 
 }
