@@ -70,8 +70,8 @@ public class Hangman {
             mask.set(secretWord.length(), true);
 
             while (state != GameState.ERRORS_5 && state != GameState.WIN) {
-                UserInterface.maskTheWord(secretWord, mask);
-                if (isCorrectLetter(UserInterface.takeALetterRecursive(), secretWord, mask)) {
+                UserInterface.maskWord(secretWord, mask);
+                if (isCorrectLetter(UserInterface.takeALetter(), secretWord, mask)) {
                     UserInterface.showMessage("Correct!");
                     if (isAnswered(mask)) {
                         state = GameState.WIN;

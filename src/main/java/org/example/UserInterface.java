@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.exceptions.NotALetterException;
+import org.example.exceptions.NotLetterException;
 import org.example.exceptions.NotYesNoAnswerException;
 import org.example.records.ValueExceptionRecord;
 
@@ -21,9 +21,9 @@ public class UserInterface {
      * @return user input can contain only one value or exception. If value is not Null, then exception is Null.
      * Conversely, if exception is not Null, then value is Null.
      */
-    private static ValueExceptionRecord<String> takeLetter(String userMessage) {
+    private static ValueExceptionRecord<String> takeLetterService(String userMessage) {
         if (userMessage == null || userMessage.isEmpty() || userMessage.isBlank())
-            userMessage = "Please enter a value:";
+            userMessage = "Please enter a letter:";
         Scanner sc = new Scanner(System.in);
         Pattern singleLetterPattern = Pattern.compile("\\p{L}");
 
@@ -32,7 +32,7 @@ public class UserInterface {
 
         //Validation.
         if (!singleLetterPattern.matcher(entry).matches()) {
-            return new ValueExceptionRecord(null, new NotALetterException(entry + " is not a single value!"));
+            return new ValueExceptionRecord(null, new NotLetterException(entry + " is not a single letter!"));
         }
 
         return new ValueExceptionRecord(entry, null);
@@ -43,11 +43,11 @@ public class UserInterface {
      * Getting the letter from user.
      * @return one single letter.
      */
-    public static String takeALetterRecursive() {
+    public static String takeALetter() {
         ValueExceptionRecord<String> letterRecord = new ValueExceptionRecord(null, null);
 
         while (letterRecord.value() == null) {
-            letterRecord = takeLetter("");
+            letterRecord = takeLetterService("");
             if (letterRecord.e() != null)
                 System.out.println(letterRecord.e().getMessage());
         }
@@ -60,12 +60,12 @@ public class UserInterface {
      * @return user answer can contain only one value or exception. If value is not Null, then exception is Null.
      * Conversely, if exception is not Null, then value is Null.
      */
-    private static ValueExceptionRecord<Boolean> takeYesNoAnswer() {
+    private static ValueExceptionRecord<Boolean> takeYesNoAnswerService() {
         String userMessage = "Please enter Y/N:";
         Pattern yesNoPattern = Pattern.compile("[YyNn]");
         Pattern yesPattern = Pattern.compile("[Yy]");
 
-        ValueExceptionRecord<String> letter = UserInterface.takeLetter(userMessage);
+        ValueExceptionRecord<String> letter = UserInterface.takeLetterService(userMessage);
         if (letter.e() != null)
             return new ValueExceptionRecord<Boolean>(null, letter.e());
 
@@ -84,7 +84,7 @@ public class UserInterface {
         ValueExceptionRecord<Boolean> answer = new ValueExceptionRecord(null, null);
 
         while (answer.value() == null) {
-            answer = takeYesNoAnswer();
+            answer = takeYesNoAnswerService();
             if (answer.e() != null)
                 System.out.println(answer.e().getMessage());
         }
@@ -97,7 +97,7 @@ public class UserInterface {
      * @param word secret word.
      * @param mask used to hold positions of answered letters.
      */
-    public static void maskTheWord(String word, BitSet mask) {
+    public static void maskWord(String word, BitSet mask) {
         for (int i = 0; i < word.length(); i++) {
             if (mask.get(i))
                 System.out.print(word.charAt(i));
