@@ -1,15 +1,20 @@
 package org.hangman.model.ImageProvider;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.awt.*;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Filter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
 public class AsciiImageProvider implements ImageProvider<String> {
@@ -27,37 +32,44 @@ public class AsciiImageProvider implements ImageProvider<String> {
     public AsciiImageProvider(String resourcePath) {
 
         asciiImages = new ArrayList<>();
-        List<String> filesPaths = new ArrayList<>();
-        StringBuilder sb;
 
-        InputStream is = AsciiImageProvider.class.getClassLoader().getResourceAsStream(resourcePath);
-        if (is == null)
-            return;
-
-        InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(streamReader);
-        try {
-            for (String line; (line = reader.readLine()) != null; )
-                filesPaths.add(resourcePath + "/" + line);
-            for (String filePath : filesPaths) {
-                is = AsciiImageProvider.class.getClassLoader().getResourceAsStream(filePath);
-                if (is == null)
-                    continue;
-
-                streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-                reader = new BufferedReader(streamReader);
-
-                sb = new StringBuilder();
-                for (String line; (line = reader.readLine()) != null; )
-                    sb.append(line).append(System.getProperty("line.separator"));
-
-                asciiImages.add(sb.toString());
-            }
-        } catch (Exception e) {
-        }
+        loadImages(resourcePath);
 
         if (asciiImages.size() > 2)
             index = 1;
+    }
+
+    private void loadImages(String resourcePath){
+        Path path = null;
+
+        try {
+            path = Path.of(AsciiImageProvider.class.getClassLoader().getResource(resourcePath).toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (path == null)
+            return;
+
+        try {
+            Files.walk(path)
+                    .filter(fileName ->
+                            fileName.toString().endsWith(".txt")
+                            )
+                    .forEach(fileName -> {
+                        try {
+                            BufferedReader br = Files.newBufferedReader(fileName);
+                            StringBuilder sb = new StringBuilder();
+                            for (String line; (line = br.readLine()) != null; )
+                                sb.append(line).append(System.getProperty("line.separator"));
+                            asciiImages.add(sb.toString());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -67,7 +79,7 @@ public class AsciiImageProvider implements ImageProvider<String> {
 
     @Override
     public String getNextImage() {
-        return asciiImages.get(index++);
+        return asciiImages.get(++index);
     }
 
     @Override
