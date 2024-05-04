@@ -1,7 +1,6 @@
 package org.hangman.controller;
 
 import org.hangman.model.Dictionary.Dictionary;
-import org.hangman.model.Dictionary.LocalDictionary;
 import org.hangman.model.Dictionary.TestDictionary;
 import org.hangman.model.DomainObjects.HangedMan;
 import org.hangman.model.ImageProvider.AsciiImageProvider;
@@ -28,12 +27,14 @@ public class Hangman {
 
     private final String USER_CORRECT_INPUT = "Correct!";
     private final String USER_WRONG_INPUT = "WRONG!";
+    private final String USER_REPEATED_INPUT = "Repeating letter!";
     private final String NO_WORDS_FOUND = "No words found, sorry...";
 
     private final int HEALTH_POINTS = 5;
 
     private String secretWord;
     private BitSet mask;
+    private Set<Character> repeatedLetters = new HashSet<>();
 
     private boolean goOn;
     private HangedMan<String> hangedMan;
@@ -75,10 +76,18 @@ public class Hangman {
             mask = initMask(secretWord);
             imageProvider = new AsciiImageProvider(ASCII_IMAGES_SMALL_RESOURCE_PATH);
             hangedMan = new HangedMan<>(imageProvider, HEALTH_POINTS);
+            repeatedLetters.clear();
 
             while (hangedMan.isAlive()) {
                 info.showMaskedMessage(secretWord, mask);
                 input = characterDialog.input();
+
+                if (repeatedLetters.contains(input)) {
+                    info.showMessage(USER_REPEATED_INPUT);
+                    continue;
+                }
+                else
+                    repeatedLetters.add(input);
 
                 if (isCorrectLetter(input, secretWord)) {
                     updateMask(input, secretWord, mask);
@@ -129,4 +138,5 @@ public class Hangman {
 
         return false;
     }
+
 }
